@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Categories</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            padding-top: 50px;
+        }
+
+        .form-inline input {
+            width: 100%;
+        }
+
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+
+        .action-buttons button {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2 class="mb-4 text-center">Manage Categories</h2>
+        <% if (errorMessage) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errorMessage %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <% } %>
+                <% if (successMessage) { %>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <%= successMessage %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <% } %>
+                        <div class="mb-4">
+                            <a href="/api/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+                        </div <!-- Add Category Form -->
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">Add New Category</div>
+                            <div class="card-body">
+                                <form action="/api/admin/category" method="POST" class="row g-3">
+                                    <div class="col-md-10">
+                                        <input type="text" name="name" class="form-control" placeholder="Category name"
+                                            required>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <input type="text" name="description" class="form-control"
+                                            placeholder="Category Description" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary w-100">Add</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Category List -->
+                        <div class="card">
+                            <div class="card-header bg-dark text-white">Category List</div>
+                            <div class="card-body p-0">
+                                <table class="table table-striped m-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+
+                                            <th style="width: 200px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% categories.forEach((cat, index)=> { %>
+                                            <tr>
+                                                <td>
+                                                    <%= index + 1 %>
+                                                </td>
+
+                                                <td>
+
+                                                    <% if (editingId===cat._id.toString()) { %>
+
+                                                        <form action="/api/admin/category/<%= cat._id %>?_method=PUT"
+                                                            method="POST" class="d-flex align-items-center">
+                                                            <input type="text" name="name" value="<%= cat.name %>"
+                                                                class="form-control me-2" required>
+                                                            <input type="text" name="description"
+                                                                value="<%= cat.description %>" class="form-control me-2"
+                                                                required>
+                                                            <button type="submit"
+                                                                class="btn btn-success btn-sm me-2">Save</button>
+                                                            <a href="/admin/manageCategory"
+                                                                class="btn btn-secondary btn-sm">Cancel</a>
+                                                        </form>
+
+                                                        <% } else { %>
+                                                            <%= cat.name %>
+                                                <td>
+                                                    <%= cat.description %>
+                                                </td>
+                                                <% } %>
+                                                    </td>
+                                                    <td class="action-buttons">
+                                                        <!-- Delete Form -->
+                                                        <form action="/api/admin/category/<%= cat._id %>?_method=DELETE"
+                                                            method="POST" class="d-inline">
+                                                            <button class="btn btn-danger btn-sm"
+                                                                onclick="return confirm('Are you sure?')">Delete</button>
+                                                        </form>
+                                                        <!-- Edit Link (switches to inline mode by sending editingId in query) -->
+                                                        <a href="/api/admin/category/manageCategory?editingId=<%= cat._id %>"
+                                                            class="btn btn-warning btn-sm">Edit</a>
+
+                                                    </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
