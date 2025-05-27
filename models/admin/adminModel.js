@@ -1,31 +1,52 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
-const adminSchema = new mongoose.Schema(
+const adminSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+  },
+
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+
+  password: {
+    type: String,
+    required: true,
+  },
+
+  phone: {
+    type: String,
+  },
+
+  address: {
+    street: String,
+    city: String,
+    state: String,
+    zip: String,
+    country: String,
+  },
+
+  cart: [
     {
-        username: {
-            type: String,
-            required: true,
-            unique: true,
-            trim: true,
-          },
-          email: {
-            type: String,
-            required: true,
-            unique: true,
-            lowercase: true,
-          },
-          password: {
-            type: String,
-            required: true,
-          },
-          role: {
-            type: String,
-            enum: ['superadmin', 'admin'],
-            default: 'admin',
-          },
-          createdAt: {
-            type: Date,
-            default: Date.now,
-          },
-    })
+      productId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
+      },
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+    },
+  ],
+
+  role: {
+    type: String,
+    enum: ['admin', 'user'],
+    default: 'user',
+  },
+}, { timestamps: true });
+
     export default mongoose.model("Admin", adminSchema);

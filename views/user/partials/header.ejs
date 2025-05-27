@@ -1,0 +1,41 @@
+<header class="main-header">
+    <h2>My Shop</h2>
+    <div class="dropdown">
+      <button onclick="toggleDropdown()" id="dropdownBtn" aria-haspopup="true" aria-expanded="false">
+        ☰ Menu
+      </button>
+      <nav id="dropdownMenu" class="dropdown-menu" role="menu" aria-labelledby="dropdownBtn">
+        <% if (user) { %>
+          <a href="/api/users/viewcart" role="menuitem">View Cart</a>
+          <a href="/api/users/profile" role="menuitem">Profile</a>
+          <a href="/logout" role="menuitem">Logout</a>
+        <% } else { %>
+          <a href="/login" role="menuitem">Login</a>
+          <a href="/signup" role="menuitem">Signup</a>
+        <% } %>
+      </nav>
+    </div>
+  </header>
+  
+  <script>
+    function toggleDropdown() {
+      const menu = document.getElementById('dropdownMenu');
+      const btn = document.getElementById('dropdownBtn');
+      const isOpen = menu.style.display === 'block';
+      menu.style.display = isOpen ? 'none' : 'block';
+      btn.setAttribute('aria-expanded', !isOpen);
+    }
+  
+    window.addEventListener('click', function (e) {
+      const dropdown = document.querySelector('.dropdown');
+      if (!dropdown.contains(e.target)) {
+        const menu = document.getElementById('dropdownMenu');
+        const btn = document.getElementById('dropdownBtn');
+        if (menu.style.display === 'block') {
+          menu.style.display = 'none';
+          btn.setAttribute('aria-expanded', false);
+        }
+      }
+    });
+  </script>
+  

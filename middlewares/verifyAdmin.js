@@ -1,8 +1,9 @@
-// middleware/authMiddleware.js
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import Admin from '../../Ecom/models/admin/adminModel.js';  // <-- make sure this path is correct
 dotenv.config();
-export function verifyToken  (req, res, next) {
+
+export async function verifyToken(req, res, next) {
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
@@ -12,27 +13,34 @@ export function verifyToken  (req, res, next) {
   }
 
   if (!token) {
+    if (req.accepts('html')) return res.redirect('/login');
     return res.status(401).json({ message: 'Access denied. No token provided.' });
   }
 
-  try { 
+  try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-   // if (decoded.role !== 'admin') {
-    //    return res.status(403).json({ message: 'Not an admin' });
-  //    }
-    req.user = decoded;
- 
-    console.log('Decoded token:', req.user);
+
+    const user = await Admin.findById(decoded.id);
+    if (!user) {
+      if (req.accepts('html')) return res.redirect('/login');
+      return res.status(401).json({ message: 'User not found' });
+    }
+
+    req.user = user;
+    console.log('Decoded token, user loaded:', req.user);
+
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
+    console.error('Token verification failed:', err.message);
+    if (req.accepts('html')) return res.redirect('/login');
+    return res.status(401).json({ message: 'Invalid token' });
   }
-};
+}
 
-// Middleware for admin-only access
+// Admin-only middleware
 export function verifyAdmin(req, res, next) {
   verifyToken(req, res, () => {
-    if (req.user.role !== 'admin') {
+    if (req.user.role === 'admin') {
       next();
     } else {
       res.status(403).json({ message: 'Admin access only' });
@@ -40,7 +48,7 @@ export function verifyAdmin(req, res, next) {
   });
 }
 
-// Middleware for user-only access (non-admin)
+// User-only middleware
 export function verifyUserOnly(req, res, next) {
   verifyToken(req, res, () => {
     if (req.user.role !== 'admin') {
@@ -51,3 +59,4 @@ export function verifyUserOnly(req, res, next) {
   });
 }
 
+export default verifyToken;

@@ -7,31 +7,6 @@ import dotenv from "dotenv";
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Create Admin
-export const adminCreate = async (req, res) => {
-  try {
-    const { username, email, password, role, createdAt } = req.body;
-    const existingAdmin = await Admin.findOne({ username });
-    if (existingAdmin) {
-      return res.status(400).json({ message: "Username already exists" });
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const adminUser = new Admin({
-      username,
-      email,
-      password: hashedPassword,
-      role,
-      createdAt,
-    });
-    await adminUser.save();
-
-    res.status(201).json({ message: "Admin created", user: adminUser });
-  } catch (error) {
-    console.error("Error creating Admin:", error);
-    res.status(400).json({ error: "Failed to create Admin" });
-  }
-};
 
 //login
 export const adminLogin = async (req, res) => {
@@ -40,15 +15,22 @@ export const adminLogin = async (req, res) => {
 
     const adminUser = await Admin.findOne({ username });
     if (!adminUser) {
-      return res.status(400).json({ message: "Invalid username or password" });
-    }
+     // return res.status(400).json({ message: "Invalid username or password" });
+    return  res.render("index", {
+      error: "Invalid Username" 
+    })
+  }
     const isMatch = await bcrypt.compare(password, adminUser.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid username or password" });
+    //  return res.status(400).json({ message: "Invalid username or password" });
+    return res.render("index", {
+      error: "Invalid Password",  
+    })
     }
-
+    const role = adminUser.role || 'admin';
+ 
     const token = jwt.sign(
-      { id: adminUser._id, isAdmin: adminUser.isAdmin },
+      { id: adminUser._id, role },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -58,13 +40,23 @@ export const adminLogin = async (req, res) => {
       httpOnly: true,
       secure: false,
       sameSite: "lax",
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
-    res.redirect("/api/admin/dashboard");
+    if (role === 'admin') {
+      return res.redirect("/api/admin/dashboard");
+    } else if (role === 'user') {
+      return res.redirect("/"); // or any user page you define
+    } else {
+      return res.status(403).json({ message: "Access denied. Unknown role." });
+    }
+   // res.redirect("/api/admin/dashboard");
   } catch (error) {
     console.error("Login Error", error);
     res.status(500).json({ error: "Server failed" });
   }
 };
+
+//admin update
 
 //Add Category
 export const addCategory = async (req, res) => {
@@ -189,10 +181,14 @@ export const addItem = async (req, res) => {
       price,
       quantity,
       category,
-      imageUrl,
+    
       createdAt,
       createdBy,
     } = req.body;
+    let imageUrl = null;
+    if (req.file) {
+      imageUrl = '/uploads/' + req.file.filename; 
+    }
     const existingItem = await Item.findOne({ name });
     if (existingItem) {
       return res.status(400).json({ message: "Item already exists" });

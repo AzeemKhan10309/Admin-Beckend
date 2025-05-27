@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your Cart - My Shop</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-container {
+            background-color: white;
+            width: 90vw;
+            max-width: 1000px;
+            height: 90vh;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        .table-wrapper {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .total {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+            color: #28a745;
+        }
+
+        .empty-cart {
+            text-align: center;
+            font-size: 1.1em;
+            color: #666;
+            margin-top: auto;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .actions a,
+        .actions button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions a {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .actions a:hover {
+            background-color: #5a6268;
+        }
+
+        .actions button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .actions button:hover {
+            background-color: #0056b3;
+        }
+
+        #checkoutForm {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #f8f8f8;
+        }
+
+        #checkoutForm label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        #checkoutForm select,
+        #checkoutForm button {
+            padding: 10px;
+            width: 100%;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        #checkoutForm button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+
+        #checkoutForm button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cart-container">
+        <h1>Your Cart</h1>
+
+        <% if (userCart.length===0) { %>
+            <p class="empty-cart">Your cart is empty.</p>
+            <div class="actions">
+                <a href="/">Continue Shopping</a>
+            </div>
+            <% } else { %>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Price (each)</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% let total=0; %>
+                                <% userCart.forEach(item=> { %>
+                                    <tr>
+                                        <td>
+                                            <%= item.productId.name %>
+                                        </td>
+                                        <td>
+                                            <%= item.quantity %>
+                                        </td>
+                                        <td>Rs<%= item.productId.price.toFixed(2) %>
+                                        </td>
+                                        <td>Rs<%= (item.productId.price * item.quantity).toFixed(2) %>
+                                        </td>
+                                    </tr>
+                                    <% total +=item.productId.price * item.quantity; %>
+                                        <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="total">Total: Rs<%= total.toFixed(2) %>
+                </p>
+
+                <div class="actions">
+                    <a href="/">Continue Shopping</a>
+                    <button type="button" onclick="document.getElementById('checkoutForm').style.display='block'">
+                        Proceed to Checkout
+                    </button>
+                </div>
+
+                <form id="checkoutForm" action="/api/users/checkout" method="POST">
+                    <label for="paymentMethod">Select Payment Method:</label>
+                    <select name="paymentMethod" id="paymentMethod" required>
+                        <option value="">--Select Payment Method--</option>
+                        <option value="CashOnDelivery">Cash on Delivery</option>
+                        <option value="Card">Credit/Debit Card</option>
+                    </select>
+                    <button type="submit">Submit Order</button>
+                </form>
+
+                <% } %>
+    </div>
+</body>
+
+</html>

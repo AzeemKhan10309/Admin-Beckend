@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'User', 
+            ref: 'Admin', 
             required: true,
           },
           products: [
@@ -38,7 +38,7 @@ const orderSchema = new mongoose.Schema(
           },
           paymentMethod: {
             type: String,
-            enum: ['credit_card', 'paypal', 'cash_on_delivery'],
+            enum: ['CashOnDelivery', 'Card'],
             required: true,
           },
           isPaid: {

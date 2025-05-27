@@ -2,6 +2,8 @@ import Admin from '../../models/admin/adminModel.js';
 import Category from '../../models/admin/categoryModel.js';
 import Item from '../../models/admin/itemModels.js';
 import express from "express";
+import multer from 'multer';
+
 import {
   addItem,
   getAllItems,
@@ -10,6 +12,18 @@ import {
   deleteItem,
 } from "../../controllers/admin/adminController.js";
 import { verifyAdmin } from "../../middlewares/verifyAdmin.js";
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory to save uploaded files
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
+
 
 const router = express.Router();
 router.get('/manageProducts', verifyAdmin, async (req, res) => {
@@ -32,7 +46,7 @@ router.get('/manageProducts', verifyAdmin, async (req, res) => {
     });
   }
 });
-router.post("/", verifyAdmin, addItem);
+router.post("/", verifyAdmin, upload.single('profileImage'), addItem);
 router.get("/", verifyAdmin, getAllItems);
 router.get("/:id", verifyAdmin, getItemById);
 router.put("/:id", verifyAdmin, updateItem);

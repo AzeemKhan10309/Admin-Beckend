@@ -1,10 +1,10 @@
 import express from "express";
-import { adminCreate, adminLogin } from "../../controllers/admin/adminController.js";
+import {  adminLogin } from "../../controllers/admin/adminController.js";
 import Admin from "../../models/admin/adminModel.js";
 import { verifyAdmin, verifyUserOnly } from "../../middlewares/verifyAdmin.js";
 const router = express.Router();
 
-router.post("/create", adminCreate);
+//router.post("/create", adminCreate);
 router.post("/login", adminLogin);
 router.get("/dashboard", verifyAdmin, async (req, res) => {
   try {

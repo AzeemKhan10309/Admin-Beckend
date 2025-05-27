@@ -48,6 +48,7 @@
                                             <th>Customer</th>
                                             <th>Items</th>
                                             <th>Total</th>
+                                            <th>Order Date</th>
                                             <th>Status</th>
                                             <th>Actions</th>
                                         </tr>
@@ -63,18 +64,23 @@
                                                     <form action="/api/admin/orders/<%= order._id %>?_method=PUT"
                                                         method="POST">
                                                         <td>
-                                                            <%= order.customerName || 'N/A' %>
+                                                            <%= order.userId ? order.userId.username : 'N/A' %>
                                                         </td>
                                                         <td>
                                                             <ul>
                                                                 <% order.products.forEach(p=> { %>
                                                                     <li>
-                                                                        <%= p.product ? p.product.name : 'Product not found' %> (x<%= p.quantity %>)
+                                                                        <%= p.product ? p.product.name
+                                                                            : 'Product not found' %> (x<%= p.quantity %>
+                                                                                )
                                                                     </li>
                                                                     <% }) %>
                                                             </ul>
                                                         </td>
-                                                        <td>$<%= order.totalPrice %>
+                                                        <td>Rs<%= order.totalPrice %>
+                                                        </td>
+                                                        <td>
+                                                            <%= new Date(order.createdAt).toLocaleDateString('en-GB') %>
                                                         </td>
                                                         <td>
                                                             <select name="status" class="form-control" required>
@@ -100,9 +106,8 @@
                                                     </form>
                                                     <% } else { %>
                                                         <td>
-                                                            <%= order.userId ? order.userId.name : 'N/A' %>
+                                                            <%= order.userId ? order.userId.username : 'N/A' %>
                                                         </td>
-
                                                         <td>
                                                             <ul>
                                                                 <% order.products.forEach(p=> { %>
@@ -110,14 +115,17 @@
                                                                         <% if (p.product) { %>
                                                                             <%= p.product.name %> (x<%= p.quantity %>)
                                                                                     <% } else { %>
-                                                                                        <em>Product not found</em> (x<%= p.quantity %>)
+                                                                                        <em>Product not found</em> (x<%=
+                                                                                            p.quantity %>)
                                                                                             <% } %>
                                                                     </li>
                                                                     <% }) %>
                                                             </ul>
-                                                              
                                                         </td>
-                                                        <td>$<%= order.totalPrice %>
+                                                        <td>Rs<%= order.totalPrice %>
+                                                        </td>
+                                                        <td>
+                                                            <%= new Date(order.createdAt).toLocaleDateString('en-GB') %>
                                                         </td>
                                                         <td>
                                                             <%= order.status.charAt(0).toUpperCase() +
@@ -126,11 +134,12 @@
                                                         <td>
                                                             <a href="/api/admin/orders/manageOrders?editingId=<%= order._id %>"
                                                                 class="btn btn-warning btn-sm">Edit</a>
-                                                            <form action="/api/admin/orders/<%= order._id %>?_method=DELETE"
+                                                            <form
+                                                                action="/api/admin/orders/<%= order._id %>?_method=DELETE"
                                                                 method="POST" class="d-inline ms-2">
                                                                 <button class="btn btn-danger btn-sm"
                                                                     onclick="return confirm('Delete this order?')">Delete</button>
-                                                            </>
+                                                            </form>
                                                         </td>
                                                         <% } %>
                                             </tr>

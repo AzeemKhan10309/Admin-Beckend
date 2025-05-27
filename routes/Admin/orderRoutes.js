@@ -10,9 +10,9 @@ import { verifyAdmin } from "../../middlewares/verifyAdmin.js";
 const router = express.Router();
 router.get('/manageOrders', verifyAdmin, async (req, res) => {
   try {
-    const orders = await Order.find().populate("userId"). populate('products.product' ,'name price').lean();
+    const orders = await Order.find().populate("userId" ,"username"). populate('products.product' ,'name price').lean();
     const editingId = req.query.editingId || null;
-    res.render('admin/manageOrders', { orders, editingId   ,errorMessage: null,
+    res.render('admin/manageOrders', { orders, editingId:req.query.editingId || null   ,errorMessage: null,
       successMessage: null });
   } catch (error) {
     console.error('Error loading manageCategory:', error);
